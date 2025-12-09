@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VIANKA</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #fff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Splash (first screen) */
+    .splash-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, #ff9ecd 0, #3b003b 40%, #000 85%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 200;
+      cursor: pointer;
+    }
+
+    .splash-title {
+      font-size: 3rem;
+      letter-spacing: 4px;
+      margin-bottom: 8px;
+    }
+
+    .splash-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.85;
+      margin-bottom: 24px;
+      max-width: 340px;
+    }
+
+    .splash-button {
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: none;
+      background: #ff66c4;
+      color: #000;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255, 102, 196, 0.5);
+    }
+
+    .splash-hint {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    /* Main content */
+    .main-content {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin-top: 16px;
+      margin-bottom: 8px;
+      font-size: 3rem;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+
+    .video-wrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      padding: 12px;
+    }
+
+    video {
+      max-width: 100%;
+      max-height: 70vh;
+      border-radius: 16px;
+      outline: 3px solid #fff;
+    }
+
+    /* Rat & speech bubble */
+    .rat-container {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .rat-container img {
+      width: 120px;
+      user-select: none;
+      max-width: 30vw;
+    }
+
+    .speech-bubble {
+      background: #fff;
+      color: #000;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .speech-bubble.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .speech-bubble::after {
+      content: "";
+      position: absolute;
+      right: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-width: 6px;
+      border-style: solid;
+      border-color: transparent transparent transparent #ffffff;
+    }
+
+    /* Secret popup modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 150;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 24px 20px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 0 25px rgba(0,0,0,0.6);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    .modal a {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 10px 20px;
+      background: #ff66c4;
+      color: #000;
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 999px;
+      box-shadow: 0 0 14px rgba(255,102,196,0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Splash Screen -->
+  <div class="splash-overlay" id="splash">
+    <div>
+      <div class="splash-title">VIANKA</div>
+      <div class="splash-subtitle">
+        Happy Birthday. 22 is so old it's incredible.
+      </div>
+      <button class="splash-button" id="splashButton">Enter</button>
+      <div class="splash-hint">(or click anywhere)</div>
+    </div>
+  </div>
+
+  <!-- Main Page -->
+  <div class="main-content" id="mainContent">
+
+    <h1>🎉🎉SURPRISE VIANKA🎉🎉</h1>
+
+    <div class="video-wrapper">
+      <video src="vid.mp4" autoplay muted loop playsinline></video>
+    </div>
+
+    <div class="rat-container" id="ratContainer">
+      <div class="speech-bubble" id="speechBubble">Touch me...</div>
+      <img src="rat.png" id="ratImage" alt="Birthday Rat">
+    </div>
+
+    <!-- Your music file here -->
+    <audio id="music" src="music.m4a" preload="auto" loop></audio>
+
+    <!-- Secret Popup -->
+    <div class="modal" id="ratModal">
+      <div class="modal-content">
+        <button class="modal-close" id="closeModal">&times;</button>
+
+        <p>
+          Dear Vianka,<br><br>
+          I'm really glad to have met you. You are kind, smart, pretty, and an amazing roommate.<br><br>
+          I appreciate you for putting up with me and everything you do. I know that your birthday being
+          around finals adds a layer of stress, but I hope that you can have a great after-finals celebration.
+        <br> You really do deserve the best.
+        </p>
+
+        <a href="https://gmail.com" target="_blank" rel="noopener noreferrer">
+          Open your surprise
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('load', function () {
+
+      const splash = document.getElementById('splash');
+      const splashButton = document.getElementById('splashButton');
+      const mainContent = document.getElementById('mainContent');
+
+      const speechBubble = document.getElementById('speechBubble');
+      const ratImage = document.getElementById('ratImage');
+      const ratModal = document.getElementById('ratModal');
+      const closeModal = document.getElementById('closeModal');
+      const music = document.getElementById('music');
+
+      let bubbleTimerStarted = false;
+
+      function startFastFadeIn() {
+        music.volume = 0;
+        const duration = 500;
+        const step = 25;
+        const totalSteps = duration / step;
+        const increment = 1 / totalSteps;
+
+        const fade = setInterval(() => {
+          if (music.volume + increment >= 1) {
+            music.volume = 1;
+            clearInterval(fade);
+          } else {
+            music.volume += increment;
+          }
+        }, step);
+      }
+
+      function enterPage() {
+        splash.style.display = 'none';
+        mainContent.style.display = 'flex';
+
+        music.play().then(startFastFadeIn).catch(() => {
+          music.volume = 1;
+        });
+
+        if (!bubbleTimerStarted) {
+          bubbleTimerStarted = true;
+          setTimeout(() => {
+            speechBubble.classList.add('show');
+          }, 6000);
+        }
+      }
+
+      splash.addEventListener('click', enterPage);
+      splashButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        enterPage();
+      });
+
+      ratImage.addEventListener('click', () => {
+        ratModal.classList.add('open');
+      });
+
+      closeModal.addEventListener('click', () => {
+        ratModal.classList.remove('open');
+      });
+
+      ratModal.addEventListener('click', (e) => {
+        if (e.target === ratModal) ratModal.classList.remove('open');
+      });
+    });
+  </script>
+
+</body>
+</html>
